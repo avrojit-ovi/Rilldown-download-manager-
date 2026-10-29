@@ -263,8 +263,7 @@ pub fn uninstall() -> usize {
 #[cfg(windows)]
 fn data_dir() -> PathBuf {
     rilldown_engine::EngineConfig::platform_default()
-        .map(|config| config.data_dir)
-        .unwrap_or_else(|_| PathBuf::from("."))
+        .map_or_else(|_| PathBuf::from("."), |config| config.data_dir)
 }
 
 #[cfg(windows)]
