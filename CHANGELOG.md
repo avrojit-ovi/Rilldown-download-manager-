@@ -55,7 +55,7 @@ First public release. Windows x64 and ARM64 (NSIS), Linux x64 and ARM64
   schedules or post-queue actions, no start-with-the-OS, no macOS builds, no
   per-connection progress bars, no category folder routing, no pinned digests
   for the downloaded media tools, and no encryption at rest for stored cookies,
-  headers, or proxy URLs. See the README's “Not in 0.1.0” section.
+  headers, or proxy URLs. See the README's “What 0.1.0 does not do” section.
 
 [Unreleased]: https://github.com/avrojit-ovi/Rilldown-download-manager-/compare/v0.1.0...HEAD
 [0.1.0]: https://github.com/avrojit-ovi/Rilldown-download-manager-/releases/tag/v0.1.0
