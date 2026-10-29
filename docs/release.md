@@ -62,6 +62,12 @@ dispatch), signs updater artifacts, and publishes a GitHub Release with the
 installers attached. To keep a build back, delete the release or re-run the
 tag; there is no manual publish step.
 
+Signing only happens when both `TAURI_SIGNING_PRIVATE_KEY` and
+`TAURI_SIGNING_PRIVATE_KEY_PASSWORD` are set. Otherwise the workflow builds
+unsigned installers with `createUpdaterArtifacts` disabled, so a missing or
+mismatched key never blocks a release — it only means no `latest.json` is
+published and the in-app updater stays off for that build.
+
 The updater endpoint is:
 
 ```

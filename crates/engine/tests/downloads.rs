@@ -38,6 +38,7 @@ async fn start_server(payload: Vec<u8>, failures: usize) -> (String, TestState) 
         .route("/norange.bin", get(no_range))
         .route("/flaky.bin", get(flaky))
         .route("/slow.bin", get(slow))
+        .route("/trickle.bin", get(trickle))
         .route("/unknown.bin", get(unknown_length))
         .route("/disposition.bin", get(disposition))
         .with_state(state.clone());
@@ -51,15 +52,19 @@ async fn start_server(payload: Vec<u8>, failures: usize) -> (String, TestState) 
 }
 
 async fn file(State(state): State<TestState>, method: Method, headers: HeaderMap) -> Response {
-    ranged_response(&state, &method, &headers, false, false)
+    ranged_response(&state, &method, &headers, Pacing::Instant, false)
 }
 
 async fn slow(State(state): State<TestState>, method: Method, headers: HeaderMap) -> Response {
-    ranged_response(&state, &method, &headers, true, false)
+    ranged_response(&state, &method, &headers, Pacing::Slow, false)
+}
+
+async fn trickle(State(state): State<TestState>, method: Method, headers: HeaderMap) -> Response {
+    ranged_response(&state, &method, &headers, Pacing::Trickle, false)
 }
 
 async fn flaky(State(state): State<TestState>, method: Method, headers: HeaderMap) -> Response {
-    ranged_response(&state, &method, &headers, false, true)
+    ranged_response(&state, &method, &headers, Pacing::Instant, true)
 }
 
 async fn no_range(State(state): State<TestState>, method: Method) -> Response {
@@ -114,11 +119,20 @@ async fn disposition(State(state): State<TestState>, method: Method) -> Response
     }
 }
 
+/// How a range response is paced. `Trickle` spreads a transfer over several
+/// progress checkpoints so a test can pause it mid-flight.
+#[derive(Clone, Copy)]
+enum Pacing {
+    Instant,
+    Slow,
+    Trickle,
+}
+
 fn ranged_response(
     state: &TestState,
     method: &Method,
     headers: &HeaderMap,
-    slow: bool,
+    pacing: Pacing,
     flaky: bool,
 ) -> Response {
     let total = state.payload.len() as u64;
@@ -165,10 +179,22 @@ fn ranged_response(
     };
 
     let length = end - start + 1;
-    let body = if slow {
-        slow_body(state.payload.as_ref().clone(), start as usize, end as usize)
-    } else {
-        Body::from(state.payload[start as usize..=end as usize].to_vec())
+    let body = match pacing {
+        Pacing::Instant => Body::from(state.payload[start as usize..=end as usize].to_vec()),
+        Pacing::Slow => paced_body(
+            state.payload.as_ref().clone(),
+            start as usize,
+            end as usize,
+            16 * 1024,
+            Duration::from_millis(2),
+        ),
+        Pacing::Trickle => paced_body(
+            state.payload.as_ref().clone(),
+            start as usize,
+            end as usize,
+            16 * 1024,
+            Duration::from_millis(10),
+        ),
     };
 
     Response::builder()
@@ -181,15 +207,21 @@ fn ranged_response(
         .unwrap()
 }
 
-fn slow_body(payload: Vec<u8>, start: usize, end: usize) -> Body {
+fn paced_body(
+    payload: Vec<u8>,
+    start: usize,
+    end: usize,
+    chunk_size: usize,
+    delay: Duration,
+) -> Body {
     let stream = futures_util::stream::unfold(
         (payload, start, end),
-        |(payload, position, end)| async move {
+        move |(payload, position, end)| async move {
             if position > end {
                 return None;
             }
-            sleep(Duration::from_millis(2)).await;
-            let chunk_end = (position + 16 * 1024 - 1).min(end);
+            sleep(delay).await;
+            let chunk_end = (position + chunk_size - 1).min(end);
             let chunk = Bytes::copy_from_slice(&payload[position..=chunk_end]);
             Some((
                 Ok::<_, std::io::Error>(chunk),
@@ -399,7 +431,11 @@ async fn pause_checkpoints_and_resume_finishes_exactly() {
     let (base, _state) = start_server(payload.clone(), 0).await;
     let (_directory, config, engine) = setup();
 
-    let record = add(&engine, format!("{base}/slow.bin"), 4).await;
+    // Progress is checkpointed every 400 ms. `/slow.bin` would deliver 8 MiB in
+    // well under one interval on a fast runner, so the pause would land after
+    // the download finished; `/trickle.bin` keeps the transfer alive for about a
+    // second and a half.
+    let record = add(&engine, format!("{base}/trickle.bin"), 4).await;
     wait_for_progress(&engine, record.id).await;
     engine.pause(record.id).await.unwrap();
 

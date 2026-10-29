@@ -69,20 +69,39 @@ jobs:
           cargo build --release -p rilldown-native-host --target "${{ matrix.target }}"
           node scripts/prepare-sidecar.mjs release "${{ matrix.target }}"
 
+      - name: Configure signing
+        id: signing
+        shell: bash
+        env:
+          SIGNING_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          SIGNING_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+        run: |
+          args="--target ${{ matrix.target }} --bundles ${{ matrix.bundles }}"
+          if [ -n "$SIGNING_KEY" ] && [ -n "$SIGNING_PASSWORD" ]; then
+            echo "signed=true" >> "$GITHUB_OUTPUT"
+            echo "args=$args" >> "$GITHUB_OUTPUT"
+          else
+            # Tauri refuses to bundle when updater artifacts are enabled but the
+            # signing key cannot be used, so ship unsigned installers instead of
+            # failing the whole release.
+            echo "signed=false" >> "$GITHUB_OUTPUT"
+            echo "args=$args --config {\"bundle\":{\"createUpdaterArtifacts\":false}}" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Build, sign, and upload
         uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
-          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+          TAURI_SIGNING_PRIVATE_KEY: ${{ steps.signing.outputs.signed == 'true' && secrets.TAURI_SIGNING_PRIVATE_KEY || '' }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ steps.signing.outputs.signed == 'true' && secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD || '' }}
         with:
           tagName: v__VERSION__
           releaseName: Rilldown v__VERSION__
           releaseBody: |
-            Windows and Linux builds for x64 and ARM64. Windows and macOS
-            installers are unsigned unless signing secrets are configured; see
+            Windows and Linux builds for x64 and ARM64. Installers are unsigned
+            unless the updater signing secrets are configured; see
             docs/release.md for what that means.
           releaseDraft: false
           prerelease: false
-          args: --target ${{ matrix.target }} --bundles ${{ matrix.bundles }}
-          includeUpdaterJson: true
+          args: ${{ steps.signing.outputs.args }}
+          includeUpdaterJson: ${{ steps.signing.outputs.signed == 'true' }}
