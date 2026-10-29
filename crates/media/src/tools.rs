@@ -365,7 +365,10 @@ fn make_executable(path: &Path) -> MediaResult<()> {
         std::fs::set_permissions(path, permissions)?;
     }
     #[cfg(not(unix))]
-    let _ = path;
+    {
+        // Windows has no executable bit, but a missing file is still a failure.
+        std::fs::metadata(path)?;
+    }
     Ok(())
 }
 
