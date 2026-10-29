@@ -34,10 +34,11 @@ jobs:
             libayatana-appindicator3-dev librsvg2-dev libxdo-dev patchelf
       - name: Format
         run: cargo fmt --all --check
-      - name: Stage the native messaging host
+      - name: Stage generated resources
         run: |
           cargo build -p rilldown-native-host
           node scripts/prepare-sidecar.mjs debug
+          node extension/build.mjs
       - name: Clippy
         run: cargo clippy --workspace --all-targets -- -D warnings
       - name: Test
