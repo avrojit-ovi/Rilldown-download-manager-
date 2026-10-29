@@ -58,8 +58,9 @@ bundler.
 ## CI release
 
 `.github/workflows/release.yml` builds all four targets on a `v*` tag (or manual
-dispatch), signs updater artifacts, and uploads them to a **draft** GitHub
-Release. Review the draft and publish it.
+dispatch), signs updater artifacts, and publishes a GitHub Release with the
+installers attached. To keep a build back, delete the release or re-run the
+tag; there is no manual publish step.
 
 The updater endpoint is:
 
@@ -67,9 +68,9 @@ The updater endpoint is:
 https://github.com/avrojit-ovi/Rilldown-download-manager-/releases/latest/download/latest.json
 ```
 
-That URL only resolves after the draft is published and marked as the latest
-release. Until then the in-app update check reports that it cannot find an
-update manifest.
+That URL resolves once the release is the latest published one. If the workflow
+ran without the signing secrets, the in-app update check reports that it cannot
+find an update manifest.
 
 `.github/workflows/windows-build.yml` is a manual, unsigned build for testing.
 It uploads NSIS installers and executables as workflow artifacts and does not
