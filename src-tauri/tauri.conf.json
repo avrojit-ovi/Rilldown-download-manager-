@@ -4,9 +4,9 @@
   "version": "0.1.0",
   "identifier": "app.rilldown.desktop",
   "build": {
-    "beforeDevCommand": "cargo build -p rilldown-native-host && node ../scripts/prepare-sidecar.mjs debug && npm --prefix ../ui run dev",
+    "beforeDevCommand": "cargo build -p rilldown-native-host && node scripts/prepare-sidecar.mjs debug && npm --prefix ui run dev",
     "devUrl": "http://localhost:1420",
-    "beforeBuildCommand": "npm --prefix ../ui run build && node ../extension/build.mjs",
+    "beforeBuildCommand": "npm --prefix ui run build && node extension/build.mjs",
     "frontendDist": "../ui/dist"
   },
   "app": {

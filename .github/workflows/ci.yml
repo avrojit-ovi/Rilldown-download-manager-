@@ -23,6 +23,9 @@ jobs:
         with:
           components: rustfmt, clippy
       - uses: Swatinem/rust-cache@v2
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
       - name: Install Linux dependencies
         if: runner.os == 'Linux'
         run: |
@@ -31,6 +34,10 @@ jobs:
             libayatana-appindicator3-dev librsvg2-dev libxdo-dev patchelf
       - name: Format
         run: cargo fmt --all --check
+      - name: Stage the native messaging host
+        run: |
+          cargo build -p rilldown-native-host
+          node scripts/prepare-sidecar.mjs debug
       - name: Clippy
         run: cargo clippy --workspace --all-targets -- -D warnings
       - name: Test
