@@ -249,6 +249,24 @@ async fn wait_terminal(engine: &Engine, id: DownloadId) -> DownloadRecord {
     .expect("download did not reach a terminal state")
 }
 
+async fn wait_for_progress(engine: &Engine, id: DownloadId) {
+    timeout(Duration::from_secs(10), async {
+        loop {
+            let record = engine.get(id).unwrap();
+            assert!(
+                !record.state.is_terminal(),
+                "download finished before progress was observed: {record:?}"
+            );
+            if record.downloaded_bytes > 0 {
+                return;
+            }
+            sleep(Duration::from_millis(10)).await;
+        }
+    })
+    .await
+    .expect("download never reported progress");
+}
+
 async fn add(engine: &Engine, url: String, connections: u8) -> DownloadRecord {
     let mut spec = DownloadSpec::new(
         Url::parse(&url).unwrap(),
@@ -382,7 +400,7 @@ async fn pause_checkpoints_and_resume_finishes_exactly() {
     let (_directory, config, engine) = setup();
 
     let record = add(&engine, format!("{base}/slow.bin"), 4).await;
-    sleep(Duration::from_millis(180)).await;
+    wait_for_progress(&engine, record.id).await;
     engine.pause(record.id).await.unwrap();
 
     let paused = engine.get(record.id).unwrap();
