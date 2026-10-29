@@ -82,7 +82,7 @@ jobs:
             Windows and Linux builds for x64 and ARM64. Windows and macOS
             installers are unsigned unless signing secrets are configured; see
             docs/release.md for what that means.
-          releaseDraft: true
+          releaseDraft: false
           prerelease: false
           args: --target ${{ matrix.target }} --bundles ${{ matrix.bundles }}
           includeUpdaterJson: true
