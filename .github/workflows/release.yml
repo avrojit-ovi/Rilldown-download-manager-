@@ -43,9 +43,7 @@ jobs:
         with:
           node-version: 22
           cache: npm
-          cache-dependency-path: |
-            package-lock.json
-            ui/package-lock.json
+          cache-dependency-path: package-lock.json
 
       - uses: dtolnay/rust-toolchain@stable
         with:
@@ -63,9 +61,7 @@ jobs:
             libayatana-appindicator3-dev librsvg2-dev libxdo-dev patchelf
 
       - name: Install JavaScript dependencies
-        run: |
-          npm ci
-          npm --prefix ui ci
+        run: npm ci
 
       - name: Build and stage the native host
         shell: bash
