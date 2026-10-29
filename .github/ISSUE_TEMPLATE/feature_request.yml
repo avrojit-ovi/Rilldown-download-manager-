@@ -1,0 +1,57 @@
+name: Feature request
+description: Suggest a capability or behaviour for Rilldown
+title: "feat: "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        The README lists what 0.1.0 deliberately leaves out. If your idea is
+        already there, comment on that limitation instead of opening a new
+        request.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: The problem
+      description: What are you trying to do today, and where does Rilldown get in the way?
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed behaviour
+      description: What should Rilldown do instead? Concrete UI or engine behaviour helps.
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: Workarounds you tried, or how other tools handle it. Describe behaviour, do not copy their assets.
+    validations:
+      required: false
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - Engine (transfers, resume, retry, queues)
+        - Media (yt-dlp, ffmpeg, stream detection)
+        - Desktop UI
+        - Browser integration
+        - Packaging and releases
+        - Documentation
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Before submitting
+      options:
+        - label: I searched existing issues and the README limitations list.
+          required: true

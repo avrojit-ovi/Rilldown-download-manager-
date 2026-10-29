@@ -4,6 +4,11 @@ Rilldown 0.1.0 against three well-known download managers. Competitor columns
 summarize public documentation and observable behavior as of October 2026;
 vendor features change, so verify before making a purchasing decision.
 
+The README carries a wider comparison against fourteen download managers
+(IDM, FDM, JDownloader 2, XDM, AB Download Manager, Neat, Motrix, Gopeed, aria2,
+uGet, Persepolis, DownThemAll! and pyLoad). This file keeps the deeper
+capability-by-capability detail.
+
 Legend: **Yes** = supported, **Partial** = limited, **No** = not offered,
 **—** = not applicable.
 

@@ -1,0 +1,5 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Documentation
+    url: https://github.com/avrojit-ovi/Rilldown-download-manager-#readme
+    about: Install steps, supported platforms, known limitations, and the feature matrix.
