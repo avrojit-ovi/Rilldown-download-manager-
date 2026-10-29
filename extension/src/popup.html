@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Rilldown</title>
+    <link rel="stylesheet" href="popup.css" />
+  </head>
+  <body>
+    <main class="popup">
+      <header class="brand">
+        <img src="../icons/icon-32.png" alt="" width="32" height="32" />
+        <div>
+          <h1>Rilldown</h1>
+          <p>Download assistant</p>
+        </div>
+      </header>
+
+      <section class="status" aria-live="polite">
+        <span id="status-dot" class="dot"></span>
+        <div>
+          <p id="status-title" class="status-title">Checking connection…</p>
+          <p id="status-detail" class="status-detail">Looking for the desktop app</p>
+        </div>
+      </section>
+
+      <section class="page">
+        <p class="label">Current page</p>
+        <p id="page-title" class="page-title">No active tab</p>
+        <p id="page-host" class="page-host"></p>
+      </section>
+
+      <section class="media">
+        <div class="media-head">
+          <p class="label">Detected media</p>
+          <span id="media-count" class="count">0</span>
+        </div>
+        <ul id="media-list" class="media-list">
+          <li class="empty">No media found on this page.</li>
+        </ul>
+      </section>
+
+      <div class="actions">
+        <button id="send-page" class="primary" type="button">Send this page</button>
+        <button id="refresh" class="secondary" type="button">Refresh</button>
+      </div>
+
+      <p id="message" class="message" role="status"></p>
+    </main>
+    <script src="popup.js"></script>
+  </body>
+</html>

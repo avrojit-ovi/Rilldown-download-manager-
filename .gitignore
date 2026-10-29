@@ -1,0 +1,40 @@
+# Rust
+/target/
+**/*.rs.bk
+
+# Node
+node_modules/
+ui/dist/
+coverage/
+playwright-report/
+test-results/
+
+# Tauri
+src-tauri/gen/
+src-tauri/target/
+src-tauri/binaries/
+
+# Extensions
+extension/dist/
+extension/*.zip
+extension/*.xpi
+
+# Local app data / secrets
+.env
+.env.*
+!.env.example
+*.db
+*.db-shm
+*.db-wal
+*.log
+.rilldown/
+*.pem
+*.p12
+*.pfx
+
+# OS / editors
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+!.vscode/extensions.json

@@ -1,0 +1,24 @@
+{
+  "name": "rilldown-workspace",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Rilldown desktop workspace",
+  "workspaces": [
+    "ui"
+  ],
+  "scripts": {
+    "dev": "tauri dev",
+    "build": "cargo build --release -p rilldown-native-host && node scripts/prepare-sidecar.mjs release && tauri build",
+    "tauri": "tauri",
+    "ui:dev": "npm --prefix ui run dev",
+    "ui:build": "npm --prefix ui run build",
+    "test": "npm --prefix ui run test",
+    "lint": "npm --prefix ui run lint",
+    "check": "npm --prefix ui run check",
+    "ext:build": "node extension/build.mjs",
+    "icons": "python3 scripts/generate-icons.py"
+  },
+  "devDependencies": {
+    "@tauri-apps/cli": "^2"
+  }
+}

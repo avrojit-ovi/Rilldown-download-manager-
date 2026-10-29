@@ -1,0 +1,67 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "Rilldown",
+  "version": "0.1.0",
+  "identifier": "app.rilldown.desktop",
+  "build": {
+    "beforeDevCommand": "cargo build -p rilldown-native-host && node ../scripts/prepare-sidecar.mjs debug && npm --prefix ../ui run dev",
+    "devUrl": "http://localhost:1420",
+    "beforeBuildCommand": "npm --prefix ../ui run build && node ../extension/build.mjs",
+    "frontendDist": "../ui/dist"
+  },
+  "app": {
+    "windows": [
+      {
+        "label": "main",
+        "title": "Rilldown",
+        "width": 1200,
+        "height": 780,
+        "minWidth": 900,
+        "minHeight": 600,
+        "center": true,
+        "resizable": true,
+        "fullscreen": false,
+        "decorations": true
+      }
+    ],
+    "security": {
+      "csp": "default-src 'self'; img-src 'self' asset: http://asset.localhost data: https:; style-src 'self' 'unsafe-inline'; script-src 'self'; connect-src ipc: http://ipc.localhost http://localhost:1420 ws://localhost:1420"
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": "all",
+    "category": "Utility",
+    "shortDescription": "Fast, honest download manager",
+    "longDescription": "Rilldown is a local-first download manager with dynamic segmented transfers, crash-safe resume, queues, media grabbing, and browser capture.",
+    "createUpdaterArtifacts": true,
+    "externalBin": ["binaries/rilldown-native-host"],
+    "resources": {
+      "../extension/dist": "browser-extension"
+    },
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.png",
+      "icons/icon.ico"
+    ],
+    "windows": {
+      "nsis": {
+        "installMode": "currentUser"
+      }
+    },
+    "macOS": {
+      "minimumSystemVersion": "10.15"
+    }
+  },
+  "plugins": {
+    "updater": {
+      "active": true,
+      "endpoints": [
+        "https://github.com/avrojit-ovi/Rilldown-download-manager-/releases/latest/download/latest.json"
+      ],
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IEExMTJGM0ExODY4MkJEQTAKUldTZ3ZZS0dvZk1Tb1gyTjd6VlF2dlJYY3N0YUFUbUxaRDlvRVhHV1BSRDdhREljMzI2WDRpM0wK"
+    }
+  }
+}

@@ -1,0 +1,29 @@
+[package]
+name = "rilldown-native-host"
+description = "Native messaging host that connects browsers to Rilldown"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+authors.workspace = true
+repository.workspace = true
+
+[lib]
+name = "rilldown_native_host"
+path = "src/lib.rs"
+
+[[bin]]
+name = "rilldown-native-host"
+path = "src/main.rs"
+
+[dependencies]
+serde.workspace = true
+serde_json.workspace = true
+tracing.workspace = true
+tracing-subscriber.workspace = true
+
+[dev-dependencies]
+tempfile.workspace = true
+
+[lints]
+workspace = true
